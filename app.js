@@ -37,24 +37,19 @@ closeIcon.addEventListener("click", function(){
 });
 
 // ----------------------------
-// Lazy Load Videos on Scroll
+// Lazy Load Videos using IntersectionObserver
 // ----------------------------
 document.addEventListener("DOMContentLoaded", function () {
-    const allVideos = document.querySelectorAll("video");
+    const videos = document.querySelectorAll("video");
 
-    const lazyLoadVideo = (video) => {
-        const rect = video.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom > 0 && video.dataset.loaded !== "true") {
-            video.load();
-            video.dataset.loaded = "true";
-        }
-    };
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting && entry.target.dataset.loaded !== "true"){
+                entry.target.load(); // Load the video when visible
+                entry.target.dataset.loaded = "true";
+            }
+        });
+    }, { threshold: 0.25 });
 
-    const checkVideos = () => allVideos.forEach(lazyLoadVideo);
-
-    window.addEventListener("scroll", checkVideos);
-    window.addEventListener("resize", checkVideos);
-
-    // Initial check
-    checkVideos();
+    videos.forEach(video => observer.observe(video));
 });
